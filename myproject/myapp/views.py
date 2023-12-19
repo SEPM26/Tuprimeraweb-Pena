@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
-from .models import Product, Customer
-from .forms import ProductForm, CustomerForm, SearchForm
+from .models import Product, Customer, Categoria
+from .forms import ProductForm, CustomerForm, SearchForm, CategoriaForm
+from django.views.generic.base import View
+
 
 
 def product_create(request):
@@ -34,3 +36,19 @@ def search(request):
         form = SearchForm()
     return render(request, 'search.html', {'form': form})
 
+class ListaCategoriasView(View):
+    template_name = 'lista_categorias.html'
+
+    def get(self, request):
+        categorias = Categoria.objects.all()
+        form = CategoriaForm()
+        return render(request, self.template_name, {'categorias': categorias, 'form': form})
+
+    def post(self, request):
+        form = CategoriaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('lista_categorias')
+
+        categorias = Categoria.objects.all()
+        return render(request, self.template_name, {'categorias': categorias, 'form': form})
